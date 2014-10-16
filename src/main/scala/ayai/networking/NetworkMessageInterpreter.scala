@@ -60,6 +60,7 @@ class NetworkMessageInterpreter extends Actor {
     val future = roomList ? GetWorldById(id)
     Await.result(future, timeout.duration).asInstanceOf[Option[RoomWorld]] match {
       case Some(room: RoomWorld) => room
+      case None => throw new RuntimeException(s"no room found for id: $id") // TODO handle this better
     }
   }
 

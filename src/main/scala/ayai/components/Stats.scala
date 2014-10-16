@@ -21,7 +21,7 @@ case class Stat(attributeType: String, var magnitude: Int, growth: Int) {
   /*
     Will first check if to process the effect again, and if invalid then remove the effect
   */
-  def updateCachedValue() {
+  def updateCachedValue(): Int = {
     var isAbsolute: Boolean = false 
     var absoluteValue: Effect = null
     cachedValue = magnitude
@@ -61,7 +61,8 @@ case class Stat(attributeType: String, var magnitude: Int, growth: Int) {
         } 
       }
     }
-    return cachedValue
+
+    cachedValue
   }
 
   def addEffect(effect: Effect) {
@@ -103,7 +104,8 @@ class Stats(val stats: ArrayBuffer[Stat] = new ArrayBuffer[Stat]()) extends Comp
         return stat
       }
     }
-    return new Stat("", 0, 0)
+
+    new Stat("", 0, 0)
   }
 
   def getValueByAttribute(attributeType: String): Int = {
@@ -112,7 +114,8 @@ class Stats(val stats: ArrayBuffer[Stat] = new ArrayBuffer[Stat]()) extends Comp
         return stat.getValue()
       }
     }
-    return 0    
+
+    0
   }
 
   def addEffect(effect: Effect) {
@@ -122,7 +125,7 @@ class Stats(val stats: ArrayBuffer[Stat] = new ArrayBuffer[Stat]()) extends Comp
 
   def updateCachedValue() {
     for(stat <- stats) {
-      stat.updateCachedValue
+      stat.updateCachedValue()
     }
   }
 

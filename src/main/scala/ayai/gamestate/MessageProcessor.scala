@@ -43,6 +43,7 @@ object MessageProcessor {
   def apply(world: RoomWorld) = new MessageProcessor(world)
 }
 
+// TODO clean this class up and factor out processing so it's not so huge
 class MessageProcessor(world: RoomWorld) extends Actor {
   implicit val formats = Serialization.formats(NoTypeHints)
   implicit val timeout = Timeout(2 seconds)
@@ -201,7 +202,7 @@ class MessageProcessor(world: RoomWorld) extends Actor {
         //}
       }
       case EquipMessage(userId: String, slot: Int, equipmentType: String) =>
-        world.getEntityByTag(s"$userId") match {
+        world.getEntityByTag(userId) match {
           case Some(e: Entity) =>
             (e.getComponent(classOf[Inventory]),
               e.getComponent(classOf[Equipment])) match {
@@ -246,7 +247,7 @@ class MessageProcessor(world: RoomWorld) extends Actor {
               }
         }
       case UnequipMessage(userId: String, equipmentType: String) =>
-        world.getEntityByTag(s"$userId") match {
+        world.getEntityByTag(userId) match {
           case Some(e: Entity) =>
             (e.getComponent(classOf[Inventory]),
               e.getComponent(classOf[Equipment])) match {
@@ -272,9 +273,9 @@ class MessageProcessor(world: RoomWorld) extends Actor {
         sender ! Success
 
       case DropItemMessage(userId: String, slot: Int) =>
-        world.getEntityByTag(s"$userId") match {
+        world.getEntityByTag(userId) match {
           case Some(e: Entity) =>
-            (e.getComponent(classOf[Inventory])) match {
+            e.getComponent(classOf[Inventory]) match {
               case (Some(inventory: Inventory)) =>
                 if(!(inventory.inventory.size <= 0)) {
                   //This should drop by item id not by slot
@@ -283,15 +284,16 @@ class MessageProcessor(world: RoomWorld) extends Actor {
                   InventoryTable.deleteItem(item, e)
                 }
             }
+          case None =>
         }
         sender ! Success
 
       // copy quest information from npc to player
-      // FIX NULLS IN MESSAGES
+      // TODO FIX NULLS IN MESSAGES
       case AcceptQuestMessage(userId: String, entityId: String, questId: Int) =>
         //might want to calculate interact message here
         // also might want to check distance between npc and player
-        var npcQuest: Quest = world.getEntityByTag(s"$entityId") match {
+        val npcQuest: Quest = world.getEntityByTag(entityId) match {
           case Some(e: Entity) => e.getComponent(classOf[QuestBag]) match {
             case Some(questBag: QuestBag) =>
               var tempQuest: Quest = null
@@ -306,7 +308,7 @@ class MessageProcessor(world: RoomWorld) extends Actor {
           case _ => null
         }
 
-        world.getEntityByTag(s"$userId") match {
+        world.getEntityByTag(userId) match {
           case Some(e: Entity) => e.getComponent(classOf[QuestBag]) match {
             case Some(questBag: QuestBag) =>
               questBag.addQuest(npcQuest)
@@ -315,7 +317,7 @@ class MessageProcessor(world: RoomWorld) extends Actor {
         }
         sender ! Success
       case AbandonQuestMessage(userId: String, questId: Int) =>
-        world.getEntityByTag(s"$userId") match {
+        world.getEntityByTag(userId) match {
           case Some(e: Entity) => e.getComponent(classOf[QuestBag]) match {
             case Some(questBag: QuestBag) =>
               for(quest <- questBag.quests) {
@@ -406,10 +408,10 @@ class MessageProcessor(world: RoomWorld) extends Actor {
 
 
       case LootMessage(userId: String, entityId: String, itemId: Int) =>
-        val userEntity = world.getEntityByTag(s"$userId") match {
+        val userEntity = world.getEntityByTag(userId) match {
           case Some(e: Entity) => e
         }
-        val itemEntity = world.getEntityByTag(s"$entityId") match {
+        val itemEntity = world.getEntityByTag(entityId) match {
           case Some(e: Entity) => e
         }
 
@@ -475,7 +477,7 @@ class MessageProcessor(world: RoomWorld) extends Actor {
       case UseItemMessage(userId: String, itemId: Int) =>
       println("itemuse message")
         val itemUseId = (new UID()).toString
-        world.getEntityByTag(s"$userId") match {
+        world.getEntityByTag(userId) match {
           case Some(e: Entity) =>
           val entity = world.createEntity("ITEMUSE"+itemUseId)
             e.getComponent(classOf[Inventory]) match {
@@ -505,7 +507,7 @@ class MessageProcessor(world: RoomWorld) extends Actor {
                 val entity = EntityFactory.createLoot(world, item, actorSystem, new Position(x,y))
                 world.addEntity(entity)
               } else {
-                world.getEntityByTag(s"$userId") match {
+                world.getEntityByTag(userId) match {
                   case Some(e: Entity) =>
                     e.getComponent(classOf[NetworkingActor]) match {
                       case Some(na: NetworkingActor) => 
