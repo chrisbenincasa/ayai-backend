@@ -20,8 +20,10 @@ import scala.concurrent.{ExecutionContext, Await}
 import scala.concurrent.duration._
 
 /** SockoServer
- * Runs a server which will pass packets on to the Interpreter
- **/
+  * Runs a server which will pass packets on to the Interpreter
+  **/
+
+import ExecutionContext.Implicits.global
 
 import ExecutionContext.Implicits.global
 
@@ -156,6 +158,12 @@ class SockoServer(actorSystem: ActorSystem) extends Logger {
     webServer.start()
 
     println("Running SockoServer")
+  }
+
+  private def answerWith100IfNecessary(requestEvent: HttpRequestEvent): Unit = {
+    if (requestEvent.request.is100ContinueExpected) {
+      requestEvent.response.write100Continue()
+    }
   }
 
   private def answerWith100IfNecessary(requestEvent: HttpRequestEvent): Unit = {

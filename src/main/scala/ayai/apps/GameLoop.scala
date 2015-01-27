@@ -27,9 +27,9 @@ import net.liftweb.json.JsonDSL._
 import org.slf4j.LoggerFactory
 
 /**
-** The main loop of the Ayai Game
-** First loads all needed Actors, creates needed worlds, and runs the game loop
-**/
+ ** The main loop of the Ayai Game
+ ** First loads all needed Actors, creates needed worlds, and runs the game loop
+ **/
 object GameLoop {
 
   private lazy val log = LoggerFactory.getLogger(getClass)
@@ -132,5 +132,4 @@ object GameLoop {
     }
   }
 }
-
 

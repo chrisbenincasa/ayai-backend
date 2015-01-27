@@ -161,7 +161,6 @@ class GameStateSerializer(world: World) extends Actor {
         }
         case _ => JNothing
       }
-
     ("models" -> jsonLift)
   }
 

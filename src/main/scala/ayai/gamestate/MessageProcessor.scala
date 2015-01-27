@@ -254,7 +254,7 @@ class MessageProcessor(world: RoomWorld) extends Actor {
       case DropItemMessage(userId: String, slot: Int) =>
         world.getEntityByTag(s"$userId") match {
           case Some(e: Entity) =>
-            e.getComponent[Inventory] match {
+            e.getComponent(classOf[Inventory]) match {
               case (Some(inventory: Inventory)) =>
                 if (!(inventory.inventory.size <= 0)) {
                   //This should drop by item id not by slot
@@ -272,7 +272,7 @@ class MessageProcessor(world: RoomWorld) extends Actor {
         //might want to calculate interact message here
         // also might want to check distance between npc and player
         val npcQuest: Quest = world.getEntityByTag(s"$entityId") match {
-          case Some(e: Entity) => e.getComponent[QuestBag] match {
+          case Some(e: Entity) => e.getComponent(classOf[QuestBag]) match {
             case Some(questBag: QuestBag) =>
               var tempQuest: Quest = null
               for(quest <- questBag.quests) {
