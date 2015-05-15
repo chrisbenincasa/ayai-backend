@@ -2,7 +2,7 @@ package ayai.systems.ai.pathfinding
 
 import akka.actor.ActorSystem
 import ayai.components.Position
-import ayai.components.pathfinding.{AStarPathfinder, Pathfinder}
+import ayai.components.pathfinding._
 import ayai.factories.GraphFactory
 import ayai.gamestate.RoomWorld
 import crane.{Entity, EntityProcessingSystem}
@@ -28,15 +28,20 @@ class PathfindingSystem(actorSystem: ActorSystem) extends EntityProcessingSystem
       pathfinding <- e.getComponent(classOf[AStarPathfinder]).toList.map(_.asInstanceOf[AStarPathfinder])
       position <- e.getComponent(classOf[Position]).toList.map(_.asInstanceOf[Position])
     } {
-      //println(s"Processing entity = ${e.uuid} for AStar at position $position")
+      //println(s"Processing entity = ${e.uuid} for AStarPathfinder at position $position")
 
       // TODO: replace with real target
-      pathfinding.findPath(map, position, position) match {
+      val movementStyle = new ManhattanMovementStyle
+      val graphView = new NodeMatrixGraphView(map, movementStyle)
+      val conversionRatio: Float = ???
+      val nmPosition = NodeMatrixPosition.fromPosition(position, conversionRatio)
+      pathfinding.findPath(graphView, nmPosition, nmPosition) match {
         case Some(path) => {
           if (path.isEmpty) {
             // We are at the goal
           } else {
             // Change velocity, position, whatever
+            // This part will probably call .toPosition(conversionRatio) on a NodeMatrixPosition
           }
         }
         case None => {

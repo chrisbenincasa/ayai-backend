@@ -2,7 +2,7 @@ package ayai.components.pathfinding
 
 trait GridMovementStyle {
   def distanceHeuristic: DistanceHeuristic
-  def neighboringPositionFinder: NeighboringPositionFinder
+  def neighboringPositionFinder(map: NodeMatrix): NeighboringPositionFinder
 }
 
 /**
@@ -10,7 +10,7 @@ trait GridMovementStyle {
  */
 class ManhattanMovementStyle extends GridMovementStyle {
   override def distanceHeuristic: DistanceHeuristic = new ManhattanDistance
-  override def neighboringPositionFinder: NeighboringPositionFinder = new ManhattanNeighboringPositionFinder
+  override def neighboringPositionFinder(map: NodeMatrix): NeighboringPositionFinder = new ManhattanNeighboringPositionFinder(map)
 }
 
 /**
@@ -18,7 +18,7 @@ class ManhattanMovementStyle extends GridMovementStyle {
  */
 class ChebyshevMovementStyle extends GridMovementStyle {
   override def distanceHeuristic: DistanceHeuristic = new ChebyshevDistance
-  override def neighboringPositionFinder: NeighboringPositionFinder = new ChebyshevNeighboringPositionFinder
+  override def neighboringPositionFinder(map: NodeMatrix): NeighboringPositionFinder = new ChebyshevNeighboringPositionFinder(map)
 }
 
 /**
@@ -27,5 +27,5 @@ class ChebyshevMovementStyle extends GridMovementStyle {
  */
 class WallSensitiveChebyshevMovementStyle extends GridMovementStyle {
   override def distanceHeuristic: DistanceHeuristic = new ChebyshevDistance
-  override def neighboringPositionFinder: NeighboringPositionFinder = new WallSensitiveChebyshevNeighboringPositionFinder
+  override def neighboringPositionFinder(map: NodeMatrix): NeighboringPositionFinder = new WallSensitiveChebyshevNeighboringPositionFinder(map)
 }
