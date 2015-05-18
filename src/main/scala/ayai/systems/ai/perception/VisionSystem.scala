@@ -47,6 +47,7 @@ class VisionSystem(actorSystem: ActorSystem) extends PerceptionSystem(actorSyste
                       (seeingEntity.getComponent(classOf[Character]),
                         seenEntity.getComponent(classOf[Character])) match {
                         case (Some(char1: Character), Some(char2: Character)) => {
+                          vision.entitiesInSight.add(seenEntity)
                           if (spamLog) log.warn(char1.name + " sees " + char2.name)
                         }
                         case _ =>
@@ -59,7 +60,7 @@ class VisionSystem(actorSystem: ActorSystem) extends PerceptionSystem(actorSyste
                           (seeingEntity.getComponent(classOf[Character]),
                             seenEntity.getComponent(classOf[Character])) match {
                             case (Some(char1: Character), Some(char2: Character)) => {
-
+                              vision2.entitiesInSight.add(seeingEntity)
                               if (spamLog) log.warn(char2.name + " sees " + char1.name)
 
                             }

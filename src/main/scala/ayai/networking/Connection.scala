@@ -27,6 +27,7 @@ case class MoveMessage(socketId: String, start: Boolean, direction: MoveDirectio
 case class ItemMessage(id : String, itemAction : ItemAction) extends ProcessorMessage
 case class AttackMessage(socketId: String) extends ProcessorMessage
 case class SocketCharacterMap(socketId: String, id: String) extends ProcessorMessage
+case class PositionUpdateMessage(id: String, x: Int, y: Int) extends ProcessorMessage
 
 case class LoginPost(request: HttpRequestEvent) extends NetworkMessage
 case class RegisterPost(request: HttpRequestEvent) extends NetworkMessage

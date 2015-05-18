@@ -1,16 +1,32 @@
 package ayai.components.pathfinding
 
+import ayai.components.Position
 import crane.Component
+import net.liftweb.json._
+import net.liftweb.json.Serialization.{read, write}
+import net.liftweb.json.JsonDSL._
 
 import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
 
 
-abstract class Pathfinder(movementStyle: GridMovementStyle) extends Component {
+abstract class Pathfinder(val movementStyle: GridMovementStyle) extends Component {
+  implicit val formats = Serialization.formats(NoTypeHints)
+
+  val currentPath: ListBuffer[Position] = ListBuffer.empty[Position]
+  var pathHasChanged: Boolean = false
+
   def findPath(map: NodeMatrix, start: NodeMatrixPosition, goal: NodeMatrixPosition): Option[Seq[NodeMatrixPosition]] = {
     findPath(new NodeMatrixGraphView(map, movementStyle), start, goal)
   }
 
   def findPath(graph: NodeMatrixGraphView, start: NodeMatrixPosition, goal: NodeMatrixPosition): Option[Seq[NodeMatrixPosition]]
+
+  def pathAsJson: JObject = {
+    "pathfinding" ->
+      ("path" -> currentPath.toList.map(_.asJson)) ~
+      ("path_dirty" -> pathHasChanged)
+  }
 }
 
 /**
@@ -18,7 +34,7 @@ abstract class Pathfinder(movementStyle: GridMovementStyle) extends Component {
  *
  * http://en.wikipedia.org/wiki/A*_search_algorithm
  */
-class AStarPathfinder(movementStyle: GridMovementStyle) extends Pathfinder(movementStyle) {
+class AStarPathfinder(override val movementStyle: GridMovementStyle) extends Pathfinder(movementStyle) {
   def findPath(graph: NodeMatrixGraphView, start: NodeMatrixPosition, goal: NodeMatrixPosition): Option[Seq[NodeMatrixPosition]] = {
     // this method is ported from these example implementations:
     // http://www.redblobgames.com//pathfinding/a-star/implementation.html#sec-1-4
@@ -32,7 +48,7 @@ class AStarPathfinder(movementStyle: GridMovementStyle) extends Pathfinder(movem
     cameFrom(start) = start
     costSoFar(start) = 0
 
-    while (! frontier.isEmpty) {
+    while (frontier.nonEmpty) {
       val current: NodeMatrixPosition = frontier.dequeue().value
 
       if (current == goal) {
@@ -52,7 +68,7 @@ class AStarPathfinder(movementStyle: GridMovementStyle) extends Pathfinder(movem
     }
 
     // the whole graph was explored, but we never reached the goal
-    return None
+    None
   }
 
   /**

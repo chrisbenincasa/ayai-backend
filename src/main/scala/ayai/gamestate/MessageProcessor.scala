@@ -84,6 +84,16 @@ class MessageProcessor(world: RoomWorld) extends Actor {
         sender ! Success
       }
 
+      case PositionUpdateMessage(id: String, x: Int, y: Int) => {
+        for {
+          entity <- world.getEntityByTag(id)
+          position <- entity.getComponent(classOf[Position]).map(_.asInstanceOf[Position])
+        } {
+          position.x = x
+          position.y = y
+        }
+      }
+
        // give id of the item, and what action it should do (equip, use, unequip, remove from inventory)
       case AttackMessage(userId: String) => {
        //create a projectile

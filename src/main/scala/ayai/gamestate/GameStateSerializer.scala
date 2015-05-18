@@ -2,6 +2,7 @@ package ayai.gamestate
 
 /** Ayai Imports **/
 import ayai.components._
+import ayai.components.pathfinding.AStarPathfinder
 
 /** Crane Imports **/
 import crane.{Entity, World}
@@ -78,23 +79,33 @@ class GameStateSerializer(world: World) extends Actor {
                                                  classOf[NPC], classOf[SpriteSheet]),
                                                   exclude=List(classOf[Dead]))
 
-        npcJSON= ("npcs" -> npcs.map{ npc =>
-          (npc.getComponent(classOf[Character]),
-            npc.getComponent(classOf[Position]),
-            npc.getComponent(classOf[Health]),
-            npc.getComponent(classOf[Mana]),
-            npc.getComponent(classOf[SpriteSheet])) match {
-              case (Some(character: Character), Some(position: Position),
-                Some(health: Health), Some(mana: Mana), Some(spritesheet: SpriteSheet)) =>
-                ((character.asJson) ~
-                  (position.asJson) ~
-                  (health.asJson) ~
-                  (mana.asJson) ~
-                  (spritesheet.asJson))
-              case _ =>
+        npcJSON = {
+          "npcs" -> npcs.map { npc =>
+            (npc.getComponent(classOf[Character]),
+              npc.getComponent(classOf[Position]),
+              npc.getComponent(classOf[Health]),
+              npc.getComponent(classOf[Mana]),
+              npc.getComponent(classOf[SpriteSheet])) match {
+              case (Some(character: Character), Some(position: Position), Some(health: Health), Some(mana: Mana), Some(spritesheet: SpriteSheet)) => {
+                val j = {
+                  character.asJson ~
+                    position.asJson ~
+                    health.asJson ~
+                    mana.asJson ~
+                    spritesheet.asJson
+                }
+
+                npc.getComponent(classOf[AStarPathfinder]) match {
+                  case Some(pathfinding: AStarPathfinder) => j ~ pathfinding.pathAsJson
+                  case None => j
+                }
+              }
+              case _ => {
                 log.warn("f3d3275: getComponent failed to return anything BLARG2")
                 JNothing
-            }})
+              }
+            }
+          }}
 
         val loot = world.getEntitiesWithExclusions(include=List(classOf[Loot]))
 

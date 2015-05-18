@@ -5,7 +5,7 @@ package ayai.components
 import ayai.gamestate.TileMap
 import crane.{Component, Entity}
 
-import scala.collection.mutable.ArrayBuffer
+import scala.collection.mutable.{Set => MutableSet, ArrayBuffer}
 import math.floor
 
 /** External Imports **/
@@ -29,6 +29,8 @@ class SoundEntity( var intensity : Int, var origin : Position ) extends Entity {
 }
 
 class Vision( var los : LOS, var visionRange : Int ) extends SenseComponent {
+  val entitiesInSight: MutableSet[Entity] = MutableSet.empty[Entity]
+
   def drawLine(start: Position, end : Position, bounds: Bounds, tileMap: TileMap): Boolean = {
     return los.drawLine(start, end, bounds, tileMap)
   }

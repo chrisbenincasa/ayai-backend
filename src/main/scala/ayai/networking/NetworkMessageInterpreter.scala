@@ -119,6 +119,14 @@ class NetworkMessageInterpreter extends Actor {
         queue ! new AddInterpretedMessage(worldId, new MoveMessage(userId, start, direction))
       }
 
+      case "position" => {
+        val x = compact(render(rootJSON \ "x")).toInt
+        val y = compact(render(rootJSON \ "y")).toInt
+        val id = compact(render(rootJSON \ "id")).toString
+
+        queue ! new AddInterpretedMessage(worldId, new PositionUpdateMessage(id, x, y))
+      }
+
       case "attack" => queue ! new AddInterpretedMessage(worldId, new AttackMessage(userId))
 
       case "chat" => {
